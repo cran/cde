@@ -1,0 +1,212 @@
+---
+title: "cde: a run through"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{cde: Get Started}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+Within Europe, the [Water Framework Directive](http://ec.europa.eu/environment/water/water-framework/index_en.html) (WFD) sets EU-wide standards for how the quality of surface- and ground-waters across Europe is assessed and classified. Assessment of quality using the WFD is based on a range of elements that vary depending on the type of water being assessed and are combined to give an overall classification of waterbodies into five classes (High, Good, Moderate, Poor and Bad) for surface waters and two classes (Good or Poor) for groundwaters.
+
+In the UK the Environment Agency (EA) is the competent authority responsible for monitoring and assessment of water quality within England. The EA have made the reporting data relating to the requirements of the WFD available via the Catchment Data Explorer (CDE) website, [https://environment.data.gov.uk/catchment-planning/](https://environment.data.gov.uk/catchment-planning/). 
+
+`cde` is a package for R which facilitates searching and download of the WFD reporting data for all waterbodies from the EA CDE website.
+
+The types of data that can be downloaded are: WFD status classification data, Reasons for Not Achieving Good (RNAG) status, objectives set for waterbodies, measures put in place to improve water quality and details of associated protected areas.
+
+The CDE data are made available under the [Open Government Licence v3.0](https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/) and use of the data accessed by and contained within this package implies acceptance of these licence conditions.
+
+## Installation
+
+You can install the stable version of `cde` from CRAN with:
+
+```{r cran-installation, eval = FALSE}
+install.packages("cde")
+```
+
+Or you can install the current development version from github with:
+
+```{r gh-installation, eval = FALSE}
+# if you have not done so already
+# install.packages("remotes")
+remotes::install_github("ropensci/cde")
+```
+
+## Searching for sites
+
+The `search_sites` function allows you to search for waterbodies, Operational or Management Catchments or River Basin Districts that contain a match or partial match for a specified search string (which is case-sensitive). There is a hierarchical relationship between waterbodies, catchments and River Basin Districts (RBD) as shown [here](https://environment.data.gov.uk/catchment-planning/help#help-catchment-hierarchy). As an example, we will search for waterbodies containing the name "Lark".
+
+```{r load and search, eval = TRUE}
+# load the package
+library(cde)
+
+# search for waterbodies containing the name "Lark"
+lark_wb<-search_names(string="Lark", column="name")
+```
+
+The dataframe returned contains details of all the waterbodies containing the string "Lark" in their name. The details returned include waterbody id codes (WBID), type of waterbody, Operational and Management Catchment names and River Basin District.
+
+```{r show lark_wb content,eval=TRUE}
+# show the top 6 rows of the 'name' column
+head(lark_wb$name)
+```
+
+To search for Operational Catchments containing the same string we would use the following code.
+
+```{r lark search, eval=TRUE}
+lark_oc<-search_names(string="Lark", column="OC")
+```
+
+## Retrieving quality status classification data
+
+Having located a waterbody, catchment or River Basin District that we want to retrieve data for, we can use the `get_status` function to retrieve the status classification information from the CDE website. We can extract the data for a specific year, or a range of years. For Operational/Management Catchment or River Basin District level downloads, we can also extract information just for a specific waterbody type (such as rivers) or for all waterbody types. In addition it is possible to extract classification data relating to a specific element of the classification.
+
+The overall classification is made up of a number of different elements in a hierarchy. Details of the hierarchy of classification levels can be found [here](https://environment.data.gov.uk/catchment-planning/help#help-classification-hierarchy). By default it retrieves the "Overall Water Body"" classification status, but by specifying the `level`, information on a specific level of classification can be retrieved. The possible values are:
+
+Level 1 | Level 2 | Level 4
+--- | --- | ---
+Ecological | Biological quality elements | Overall Water Body
+Chemical | Chemical Status element | -
+Quantitative | Hydromorphological Supporting Elements | -
+ - | Other Substances | -
+ - | Physico-chemical quality elements | -
+ - | Priority hazardous substances | -
+ - | Priority substances | -
+ - | Quantitative Status element | - 
+ - | Specific pollutants | -
+ - | Supporting elements | -
+
+The function returns an object of class `cde_df` (basically a dataframe with custom print and plot methods) containing the status (and other details) for the specified combination of column, value, level and dates. Note that during 2013 and 2014 waterbodies were classified under both Cycle 1 and Cycle 2 methodologies. The status information extracted for these years is just for the Cycle 2 classification, to avoid double counting. There was also a change in some of the environmental standards applied to chemical aspects of status assessment between cycles, so there may be some noticeable changes in status between these years. See [here](https://environment.data.gov.uk/catchment-planning/help#help-surface-water-chemical-classification) for more details.
+
+For details of the meaning of the the different columns returned, see the [output reference list](../articles/cde-output-reference.html).
+
+```{r status data, eval=TRUE}
+# extract overall waterbody status classification data for a single 
+# waterbody in all years
+
+# first decide which waterbody, we can use one from the first search 
+# above (need the WBID information)
+head(lark_wb)
+
+# we will get data for the first waterbody here (WBID: GB105033042920, 
+# name: Lark (US Hawstead))
+lark_hawstead<-get_status(ea_name="GB105033042920", column="WBID")
+
+# the dataframe returned contains all of the data for this site in all 
+# years (we did not specify year/year range).
+lark_hawstead
+
+# just a quick look at the actual status data
+table(lark_hawstead$status)
+```
+
+An example of a higher level download, specifying a year range and type (in this case Rivers).
+
+```{r lark river,eval=TRUE}
+# download status data for a given year range and type of waterbody
+lark_OC_rivers<-get_status(ea_name="Lark", column="OC", startyr=2013, endyr=2015, type="River")
+# print out the results
+lark_OC_rivers
+```
+
+To get information about status classification in relation to a specific level in the classification, we can specify `level` as well (see table above for options and [here](https://environment.data.gov.uk/catchment-planning/help#help-classification-hierarchy) for more details on the classification levels used).
+
+```{r lark rivers chem, eval=TRUE}
+# download Chemical status for rivers in all years
+lark_OC_rivers_chem<-get_status(ea_name="Lark", column="OC", type="River", level="Chemical")
+```
+
+## Plotting quality status classification data
+
+The `get_status` function, along with other `get_...` functions, has a `plot` method which provides quick overview plots of status classes, giving a plot of percentages of waterbodies in different status classes for the combination of criteria specified. Plotting is only possible for Operational/Management Catchment or River Basin District downloads.
+
+```{r lark plot, fig.height=4, fig.width=6.5, fig.align="center", eval=TRUE}
+# get overall waterbody status information for the Lark OC between 2013 and 2015
+lark_OC_2013_15 <- get_status(ea_name="Lark", column="OC", startyr=2013, endyr=2015)
+# plot the data
+plot(lark_OC_2013_15)
+```
+
+For plots, the colour scheme used is based on the `viridis` palette. For `get_status` and `get_objectives` an alternative colour scheme, based on the WFD-defined status class colours, can be used instead by setting `scheme="wfd"` within a `plot` call. Also if a single year is specified, a standard (as opposed to stacked) barplot is produced as shown below.
+
+```{r lark riverplot wfd,fig.height=4, fig.width=6.5, fig.align="center", eval=TRUE}
+# get the overall waterbody status information for rivers in the Lark OC in 2015
+lark_OC_rivers_2015 <- get_status(ea_name="Lark", column="OC", startyr=2015, type="River")
+# plot these data, using WFD colour scheme
+plot(lark_OC_rivers_2015, scheme="wfd")
+```
+
+## Reasons for Not Achieving Good status
+
+Not all waterbodies in the Lark Operational Catchment example above have achieved Good status. The `get_rnag` function downloads Reasons for Not Achieving Good (RNAG) data, which allow us to find out more detail on the pressures on the waterbodies that have been assessed to be driving the failure. RNAG data are only available from 2013 onwards. The RNAG data can be extracted for specific years, and also for specific classification levels, as per the status data above.
+
+For details of the meaning of the the different columns returned, see the [output reference list](../articles/cde-output-reference.html).
+
+```{r RNAG in Lark, eval=TRUE}
+# what are the RNAG for the Lark OC between 2013 and 2015
+lark_OC_RNAG_2013_15<-get_rnag(ea_name="Lark", column="OC", startyr=2013, endyr=2015)
+```
+
+Plots of RNAG data are given as frequency histograms of the occurence of information in the `pressure_tier_3` column. For details of this, see the [reference list](../articles/cde-output-reference.html).
+
+```{r lark RNAG plot,fig.height=4, fig.width=6.5, fig.align="center", eval=TRUE}
+# plot RNAG data for the Lark OC, between 2013 and 2015
+plot(lark_OC_RNAG_2013_15)
+```
+
+## Objectives set for waterbodies
+
+For those waterbodies that are at less than Good status, objectives are set to indicate what status is aimed for in the longer term. The objectives are set in relation to what is determined to be achievable in the given timescale. Therefore objectives have been set in relation to the 6-year cycle of assessment (so years 2015, 2021 and 2027, then also 2040 and 2050 for long-term objectives). Using the `get_objectives` function, we can download objectives for waterbodies, catchments or River Basin Districts. Objectives can be downloaded for a specific year (2015, 2021, 2027, 2040 or 2050), level of classification and waterbody type as per the `get_status` function. Note however that not all waterbodies have objectives set for all years, levels or types. If no objectives are set for the criteria specified, a message is given.
+
+For details of the meaning of the the different columns returned, see the [output reference list](../articles/cde-output-reference.html).
+
+```{r lark obj, eval=TRUE}
+# download the objectives set for 2015 for the Lark Operational Catchment
+lark_OC_obj_2015<-get_objectives(ea_name="Lark", column="OC", year=2015)
+```
+
+Plotting of objectives is similar to that of `get_status` data, except the status classes represent the target objectives predicted to be achieved by the date specified.
+```{r lark obj plot,fig.height=4, fig.width=6.5, fig.align="center", eval=TRUE}
+# plot the objectives for the Lark OC in 2015
+plot(lark_OC_obj_2015)
+```
+
+## Protected Areas
+
+The `get_pa` function downloads details of the protected areas associated with a waterbody, catchment or River Basin District. The protected areas listed include those designated under conservation reasons, such as SACs (Habitats and Species Directive), pollution reduction, such as Nitrate Vulnerable Zones (Nitrates Directive) or human use (Bathing Water Directive).
+
+For details of the meaning of the the different columns returned, see the [output reference list](../articles/cde-output-reference.html).
+
+```{r lark PA, eval=TRUE}
+# get details of the protected areas within the Lark Operational Catchment
+lark_OC_pa<-get_pa(ea_name="Lark", column="OC")
+```
+
+Plotting the output of `get_pa` produces a frequency histogram of the `protected_area_type` column within the area specified.
+
+```{r lark pa plot,fig.height=4, fig.width=6.5, fig.align="center", eval=TRUE}
+plot(lark_OC_pa)
+```
+
+## Measures put in place to improve status
+
+Measures are the planned actions that are intended to achieve the objectives set for given waterbodies/catchments etc. The `get_measures` function downloads the details of the measures in place or proposed. These data are very patchy, so this will quite often return no data. Only the name and column need to be specified for this - measures are not specified in more detail than this. Measures can be plotted in the same way as RNAG or Protected Areas data (frequency histogram).
+
+For details of the meaning of the the different columns returned, see the [output reference list](../articles/cde-output-reference.html).
+
+```{r lark measures, eval=FALSE}
+# what measures are there for the Lark Operational Catchment?
+lark_OC_meas<-get_measures(ea_name="Lark", column="OC")
+```
+
+Currently (2019-05-09) there is a problem with the measures data on the CDE website, and no measures information is available to be downloaded, so this will always return an empty dataframe. This is under active investigation by the EA, so should be resolved soon.

@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+<title>cde: a run through</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">cde: a run through</h1>
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Within Europe, the <a href="http://ec.europa.eu/environment/water/water-framework/index_en.html">Water Framework Directive</a> (WFD) sets EU-wide standards for how the quality of surface- and ground-waters across Europe is assessed and classified. Assessment of quality using the WFD is based on a range of elements that vary depending on the type of water being assessed and are combined to give an overall classification of waterbodies into five classes (High, Good, Moderate, Poor and Bad) for surface waters and two classes (Good or Poor) for groundwaters.</p>
+<p>In the UK the Environment Agency (EA) is the competent authority responsible for monitoring and assessment of water quality within England. The EA have made the reporting data relating to the requirements of the WFD available via the Catchment Data Explorer (CDE) website, <a href="https://environment.data.gov.uk/catchment-planning/">https://environment.data.gov.uk/catchment-planning/</a>.</p>
+<p><code>cde</code> is a package for R which facilitates searching and download of the WFD reporting data for all waterbodies from the EA CDE website.</p>
+<p>The types of data that can be downloaded are: WFD status classification data, Reasons for Not Achieving Good (RNAG) status, objectives set for waterbodies, measures put in place to improve water quality and details of associated protected areas.</p>
+<p>The CDE data are made available under the <a href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/">Open Government Licence v3.0</a> and use of the data accessed by and contained within this package implies acceptance of these licence conditions.</p>
+</div>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>You can install the stable version of <code>cde</code> from CRAN with:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">install.packages</span>(<span class="st">&quot;cde&quot;</span>)</span></code></pre></div>
+<p>Or you can install the current development version from github with:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># if you have not done so already</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="co"># install.packages(&quot;remotes&quot;)</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;ropensci/cde&quot;</span>)</span></code></pre></div>
+</div>
+<div id="searching-for-sites" class="section level2">
+<h2>Searching for sites</h2>
+<p>The <code>search_sites</code> function allows you to search for waterbodies, Operational or Management Catchments or River Basin Districts that contain a match or partial match for a specified search string (which is case-sensitive). There is a hierarchical relationship between waterbodies, catchments and River Basin Districts (RBD) as shown <a href="https://environment.data.gov.uk/catchment-planning/help#help-catchment-hierarchy">here</a>. As an example, we will search for waterbodies containing the name “Lark”.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># load the package</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="kw">library</span>(cde)</span>
+<span id="cb3-3"><a href="#cb3-3"></a></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="co"># search for waterbodies containing the name &quot;Lark&quot;</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a>lark_wb&lt;-<span class="kw">search_names</span>(<span class="dt">string=</span><span class="st">&quot;Lark&quot;</span>, <span class="dt">column=</span><span class="st">&quot;name&quot;</span>)</span></code></pre></div>
+<p>The dataframe returned contains details of all the waterbodies containing the string “Lark” in their name. The details returned include waterbody id codes (WBID), type of waterbody, Operational and Management Catchment names and River Basin District.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># show the top 6 rows of the &#39;name&#39; column</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="kw">head</span>(lark_wb<span class="op">$</span>name)</span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="co">#&gt; [1] &quot;Lark (US Hawstead)&quot;                   </span></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co">#&gt; [2] &quot;Lark downstream of Mill Street Bridge&quot;</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="co">#&gt; [3] &quot;Lark (Hawstead to Abbey Gardens)&quot;     </span></span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="co">#&gt; [4] &quot;Lark (Abbey Gardens to Mildenhall)&quot;   </span></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="co">#&gt; [5] &quot;Lark&quot;                                 </span></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="co">#&gt; [6] &quot;Lark - Fynn (d/s confluence)&quot;</span></span></code></pre></div>
+<p>To search for Operational Catchments containing the same string we would use the following code.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>lark_oc&lt;-<span class="kw">search_names</span>(<span class="dt">string=</span><span class="st">&quot;Lark&quot;</span>, <span class="dt">column=</span><span class="st">&quot;OC&quot;</span>)</span></code></pre></div>
+</div>
+<div id="retrieving-quality-status-classification-data" class="section level2">
+<h2>Retrieving quality status classification data</h2>
+<p>Having located a waterbody, catchment or River Basin District that we want to retrieve data for, we can use the <code>get_status</code> function to retrieve the status classification information from the CDE website. We can extract the data for a specific year, or a range of years. For Operational/Management Catchment or River Basin District level downloads, we can also extract information just for a specific waterbody type (such as rivers) or for all waterbody types. In addition it is possible to extract classification data relating to a specific element of the classification.</p>
+<p>The overall classification is made up of a number of different elements in a hierarchy. Details of the hierarchy of classification levels can be found <a href="https://environment.data.gov.uk/catchment-planning/help#help-classification-hierarchy">here</a>. By default it retrieves the “Overall Water Body”&quot; classification status, but by specifying the <code>level</code>, information on a specific level of classification can be retrieved. The possible values are:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Level 1</th>
+<th>Level 2</th>
+<th>Level 4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Ecological</td>
+<td>Biological quality elements</td>
+<td>Overall Water Body</td>
+</tr>
+<tr class="even">
+<td>Chemical</td>
+<td>Chemical Status element</td>
+<td>-</td>
+</tr>
+<tr class="odd">
+<td>Quantitative</td>
+<td>Hydromorphological Supporting Elements</td>
+<td>-</td>
+</tr>
+<tr class="even">
+<td>-</td>
+<td>Other Substances</td>
+<td>-</td>
+</tr>
+<tr class="odd">
+<td>-</td>
+<td>Physico-chemical quality elements</td>
+<td>-</td>
+</tr>
+<tr class="even">
+<td>-</td>
+<td>Priority hazardous substances</td>
+<td>-</td>
+</tr>
+<tr class="odd">
+<td>-</td>
+<td>Priority substances</td>
+<td>-</td>
+</tr>
+<tr class="even">
+<td>-</td>
+<td>Quantitative Status element</td>
+<td>-</td>
+</tr>
+<tr class="odd">
+<td>-</td>
+<td>Specific pollutants</td>
+<td>-</td>
+</tr>
+<tr class="even">
+<td>-</td>
+<td>Supporting elements</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<p>The function returns an object of class <code>cde_df</code> (basically a dataframe with custom print and plot methods) containing the status (and other details) for the specified combination of column, value, level and dates. Note that during 2013 and 2014 waterbodies were classified under both Cycle 1 and Cycle 2 methodologies. The status information extracted for these years is just for the Cycle 2 classification, to avoid double counting. There was also a change in some of the environmental standards applied to chemical aspects of status assessment between cycles, so there may be some noticeable changes in status between these years. See <a href="https://environment.data.gov.uk/catchment-planning/help#help-surface-water-chemical-classification">here</a> for more details.</p>
+<p>For details of the meaning of the the different columns returned, see the <a href="../articles/cde-output-reference.html">output reference list</a>.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># extract overall waterbody status classification data for a single </span></span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="co"># waterbody in all years</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a></span>
+<span id="cb6-4"><a href="#cb6-4"></a><span class="co"># first decide which waterbody, we can use one from the first search </span></span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="co"># above (need the WBID information)</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a><span class="kw">head</span>(lark_wb)</span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co">#&gt;                WBID                                  name  type    OC</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a><span class="co">#&gt; 1911 GB105033042920                    Lark (US Hawstead) River  Lark</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="co">#&gt; 1912 GB105033043052 Lark downstream of Mill Street Bridge River  Lark</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="co">#&gt; 1914 GB105033042940      Lark (Hawstead to Abbey Gardens) River  Lark</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="co">#&gt; 1918 GB105033043051    Lark (Abbey Gardens to Mildenhall) River  Lark</span></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="co">#&gt; 2197 GB105035040360                                  Lark River Deben</span></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="co">#&gt; 2200 GB105035040300          Lark - Fynn (d/s confluence) River Deben</span></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="co">#&gt;                    MC     RBD</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="co">#&gt; 1911 Cam and Ely Ouse Anglian</span></span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="co">#&gt; 1912 Cam and Ely Ouse Anglian</span></span>
+<span id="cb6-17"><a href="#cb6-17"></a><span class="co">#&gt; 1914 Cam and Ely Ouse Anglian</span></span>
+<span id="cb6-18"><a href="#cb6-18"></a><span class="co">#&gt; 1918 Cam and Ely Ouse Anglian</span></span>
+<span id="cb6-19"><a href="#cb6-19"></a><span class="co">#&gt; 2197     East Suffolk Anglian</span></span>
+<span id="cb6-20"><a href="#cb6-20"></a><span class="co">#&gt; 2200     East Suffolk Anglian</span></span>
+<span id="cb6-21"><a href="#cb6-21"></a></span>
+<span id="cb6-22"><a href="#cb6-22"></a><span class="co"># we will get data for the first waterbody here (WBID: GB105033042920, </span></span>
+<span id="cb6-23"><a href="#cb6-23"></a><span class="co"># name: Lark (US Hawstead))</span></span>
+<span id="cb6-24"><a href="#cb6-24"></a>lark_hawstead&lt;-<span class="kw">get_status</span>(<span class="dt">ea_name=</span><span class="st">&quot;GB105033042920&quot;</span>, <span class="dt">column=</span><span class="st">&quot;WBID&quot;</span>)</span>
+<span id="cb6-25"><a href="#cb6-25"></a></span>
+<span id="cb6-26"><a href="#cb6-26"></a><span class="co"># the dataframe returned contains all of the data for this site in all </span></span>
+<span id="cb6-27"><a href="#cb6-27"></a><span class="co"># years (we did not specify year/year range).</span></span>
+<span id="cb6-28"><a href="#cb6-28"></a>lark_hawstead</span>
+<span id="cb6-29"><a href="#cb6-29"></a><span class="co">#&gt;  river_basin_district management_catchment operational_catchment</span></span>
+<span id="cb6-30"><a href="#cb6-30"></a><span class="co">#&gt;               Anglian     Cam and Ely Ouse                  Lark</span></span>
+<span id="cb6-31"><a href="#cb6-31"></a><span class="co">#&gt;               Anglian     Cam and Ely Ouse                  Lark</span></span>
+<span id="cb6-32"><a href="#cb6-32"></a><span class="co">#&gt;               Anglian     Cam and Ely Ouse                  Lark</span></span>
+<span id="cb6-33"><a href="#cb6-33"></a><span class="co">#&gt;               Anglian     Cam and Ely Ouse                  Lark</span></span>
+<span id="cb6-34"><a href="#cb6-34"></a><span class="co">#&gt;               Anglian     Cam and Ely Ouse                  Lark</span></span>
+<span id="cb6-35"><a href="#cb6-35"></a><span class="co">#&gt;               Anglian     Cam and Ely Ouse                  Lark</span></span>
+<span id="cb6-36"><a href="#cb6-36"></a><span class="co">#&gt;               Anglian     Cam and Ely Ouse                  Lark</span></span>
+<span id="cb6-37"><a href="#cb6-37"></a><span class="co">#&gt;               Anglian     Cam and Ely Ouse                  Lark</span></span>
+<span id="cb6-38"><a href="#cb6-38"></a><span class="co">#&gt; With an additional 18 columns of data. </span></span>
+<span id="cb6-39"><a href="#cb6-39"></a><span class="co">#&gt; Row values may be truncated to fit console.</span></span>
+<span id="cb6-40"><a href="#cb6-40"></a></span>
+<span id="cb6-41"><a href="#cb6-41"></a><span class="co"># just a quick look at the actual status data</span></span>
+<span id="cb6-42"><a href="#cb6-42"></a><span class="kw">table</span>(lark_hawstead<span class="op">$</span>status)</span>
+<span id="cb6-43"><a href="#cb6-43"></a><span class="co">#&gt; </span></span>
+<span id="cb6-44"><a href="#cb6-44"></a><span class="co">#&gt;     Good Moderate </span></span>
+<span id="cb6-45"><a href="#cb6-45"></a><span class="co">#&gt;        1        7</span></span></code></pre></div>
+<p>An example of a higher level download, specifying a year range and type (in this case Rivers).</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># download status data for a given year range and type of waterbody</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>lark_OC_rivers&lt;-<span class="kw">get_status</span>(<span class="dt">ea_name=</span><span class="st">&quot;Lark&quot;</span>, <span class="dt">column=</span><span class="st">&quot;OC&quot;</span>, <span class="dt">startyr=</span><span class="dv">2013</span>, <span class="dt">endyr=</span><span class="dv">2015</span>, <span class="dt">type=</span><span class="st">&quot;River&quot;</span>)</span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="co"># print out the results</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a>lark_OC_rivers</span>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="co">#&gt;  river_basin_district management_catchment operational_catchment</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a><span class="co">#&gt;               Anglian     Cam and Ely Ouse                  Lark</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="co">#&gt;               Anglian     Cam and Ely Ouse                  Lark</span></span>
+<span id="cb7-8"><a href="#cb7-8"></a><span class="co">#&gt;               Anglian     Cam and Ely Ouse                  Lark</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a><span class="co">#&gt;               Anglian     Cam and Ely Ouse                  Lark</span></span>
+<span id="cb7-10"><a href="#cb7-10"></a><span class="co">#&gt;               Anglian     Cam and Ely Ouse                  Lark</span></span>
+<span id="cb7-11"><a href="#cb7-11"></a><span class="co">#&gt;               Anglian     Cam and Ely Ouse                  Lark</span></span>
+<span id="cb7-12"><a href="#cb7-12"></a><span class="co">#&gt;               Anglian     Cam and Ely Ouse                  Lark</span></span>
+<span id="cb7-13"><a href="#cb7-13"></a><span class="co">#&gt;               Anglian     Cam and Ely Ouse                  Lark</span></span>
+<span id="cb7-14"><a href="#cb7-14"></a><span class="co">#&gt;               Anglian     Cam and Ely Ouse                  Lark</span></span>
+<span id="cb7-15"><a href="#cb7-15"></a><span class="co">#&gt;               Anglian     Cam and Ely Ouse                  Lark</span></span>
+<span id="cb7-16"><a href="#cb7-16"></a><span class="co">#&gt; With an additional 26 rows and 15 columns of data. </span></span>
+<span id="cb7-17"><a href="#cb7-17"></a><span class="co">#&gt; Row values may be truncated to fit console.</span></span></code></pre></div>
+<p>To get information about status classification in relation to a specific level in the classification, we can specify <code>level</code> as well (see table above for options and <a href="https://environment.data.gov.uk/catchment-planning/help#help-classification-hierarchy">here</a> for more details on the classification levels used).</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># download Chemical status for rivers in all years</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a>lark_OC_rivers_chem&lt;-<span class="kw">get_status</span>(<span class="dt">ea_name=</span><span class="st">&quot;Lark&quot;</span>, <span class="dt">column=</span><span class="st">&quot;OC&quot;</span>, <span class="dt">type=</span><span class="st">&quot;River&quot;</span>, <span class="dt">level=</span><span class="st">&quot;Chemical&quot;</span>)</span></code></pre></div>
+</div>
+<div id="plotting-quality-status-classification-data" class="section level2">
+<h2>Plotting quality status classification data</h2>
+<p>The <code>get_status</code> function, along with other <code>get_...</code> functions, has a <code>plot</code> method which provides quick overview plots of status classes, giving a plot of percentages of waterbodies in different status classes for the combination of criteria specified. Plotting is only possible for Operational/Management Catchment or River Basin District downloads.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># get overall waterbody status information for the Lark OC between 2013 and 2015</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a>lark_OC_<span class="dv">2013</span>_<span class="dv">15</span> &lt;-<span class="st"> </span><span class="kw">get_status</span>(<span class="dt">ea_name=</span><span class="st">&quot;Lark&quot;</span>, <span class="dt">column=</span><span class="st">&quot;OC&quot;</span>, <span class="dt">startyr=</span><span class="dv">2013</span>, <span class="dt">endyr=</span><span class="dv">2015</span>)</span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="co"># plot the data</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="kw">plot</span>(lark_OC_<span class="dv">2013</span>_<span class="dv">15</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+<p>For plots, the colour scheme used is based on the <code>viridis</code> palette. For <code>get_status</code> and <code>get_objectives</code> an alternative colour scheme, based on the WFD-defined status class colours, can be used instead by setting <code>scheme=&quot;wfd&quot;</code> within a <code>plot</code> call. Also if a single year is specified, a standard (as opposed to stacked) barplot is produced as shown below.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># get the overall waterbody status information for rivers in the Lark OC in 2015</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a>lark_OC_rivers_<span class="dv">2015</span> &lt;-<span class="st"> </span><span class="kw">get_status</span>(<span class="dt">ea_name=</span><span class="st">&quot;Lark&quot;</span>, <span class="dt">column=</span><span class="st">&quot;OC&quot;</span>, <span class="dt">startyr=</span><span class="dv">2015</span>, <span class="dt">type=</span><span class="st">&quot;River&quot;</span>)</span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="co"># plot these data, using WFD colour scheme</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a><span class="kw">plot</span>(lark_OC_rivers_<span class="dv">2015</span>, <span class="dt">scheme=</span><span class="st">&quot;wfd&quot;</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+</div>
+<div id="reasons-for-not-achieving-good-status" class="section level2">
+<h2>Reasons for Not Achieving Good status</h2>
+<p>Not all waterbodies in the Lark Operational Catchment example above have achieved Good status. The <code>get_rnag</code> function downloads Reasons for Not Achieving Good (RNAG) data, which allow us to find out more detail on the pressures on the waterbodies that have been assessed to be driving the failure. RNAG data are only available from 2013 onwards. The RNAG data can be extracted for specific years, and also for specific classification levels, as per the status data above.</p>
+<p>For details of the meaning of the the different columns returned, see the <a href="../articles/cde-output-reference.html">output reference list</a>.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="co"># what are the RNAG for the Lark OC between 2013 and 2015</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a>lark_OC_RNAG_<span class="dv">2013</span>_<span class="dv">15</span>&lt;-<span class="kw">get_rnag</span>(<span class="dt">ea_name=</span><span class="st">&quot;Lark&quot;</span>, <span class="dt">column=</span><span class="st">&quot;OC&quot;</span>, <span class="dt">startyr=</span><span class="dv">2013</span>, <span class="dt">endyr=</span><span class="dv">2015</span>)</span></code></pre></div>
+<p>Plots of RNAG data are given as frequency histograms of the occurence of information in the <code>pressure_tier_3</code> column. For details of this, see the <a href="../articles/cde-output-reference.html">reference list</a>.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="co"># plot RNAG data for the Lark OC, between 2013 and 2015</span></span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="kw">plot</span>(lark_OC_RNAG_<span class="dv">2013</span>_<span class="dv">15</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+</div>
+<div id="objectives-set-for-waterbodies" class="section level2">
+<h2>Objectives set for waterbodies</h2>
+<p>For those waterbodies that are at less than Good status, objectives are set to indicate what status is aimed for in the longer term. The objectives are set in relation to what is determined to be achievable in the given timescale. Therefore objectives have been set in relation to the 6-year cycle of assessment (so years 2015, 2021 and 2027, then also 2040 and 2050 for long-term objectives). Using the <code>get_objectives</code> function, we can download objectives for waterbodies, catchments or River Basin Districts. Objectives can be downloaded for a specific year (2015, 2021, 2027, 2040 or 2050), level of classification and waterbody type as per the <code>get_status</code> function. Note however that not all waterbodies have objectives set for all years, levels or types. If no objectives are set for the criteria specified, a message is given.</p>
+<p>For details of the meaning of the the different columns returned, see the <a href="../articles/cde-output-reference.html">output reference list</a>.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="co"># download the objectives set for 2015 for the Lark Operational Catchment</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a>lark_OC_obj_<span class="dv">2015</span>&lt;-<span class="kw">get_objectives</span>(<span class="dt">ea_name=</span><span class="st">&quot;Lark&quot;</span>, <span class="dt">column=</span><span class="st">&quot;OC&quot;</span>, <span class="dt">year=</span><span class="dv">2015</span>)</span></code></pre></div>
+<p>Plotting of objectives is similar to that of <code>get_status</code> data, except the status classes represent the target objectives predicted to be achieved by the date specified.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co"># plot the objectives for the Lark OC in 2015</span></span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="kw">plot</span>(lark_OC_obj_<span class="dv">2015</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" style="display: block; margin: auto;" /></p>
+</div>
+<div id="protected-areas" class="section level2">
+<h2>Protected Areas</h2>
+<p>The <code>get_pa</code> function downloads details of the protected areas associated with a waterbody, catchment or River Basin District. The protected areas listed include those designated under conservation reasons, such as SACs (Habitats and Species Directive), pollution reduction, such as Nitrate Vulnerable Zones (Nitrates Directive) or human use (Bathing Water Directive).</p>
+<p>For details of the meaning of the the different columns returned, see the <a href="../articles/cde-output-reference.html">output reference list</a>.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="co"># get details of the protected areas within the Lark Operational Catchment</span></span>
+<span id="cb15-2"><a href="#cb15-2"></a>lark_OC_pa&lt;-<span class="kw">get_pa</span>(<span class="dt">ea_name=</span><span class="st">&quot;Lark&quot;</span>, <span class="dt">column=</span><span class="st">&quot;OC&quot;</span>)</span></code></pre></div>
+<p>Plotting the output of <code>get_pa</code> produces a frequency histogram of the <code>protected_area_type</code> column within the area specified.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="kw">plot</span>(lark_OC_pa)</span></code></pre></div>
+<p><img src="data:image/png;base64,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4GwE54jgbATniOBsBOeI4GwE54jgbATnaErBbS7n+feru/TPC3doknnZ54lbvORIBOdoWsGd3/WNPCrleDhl9eF6/sThXpgtwXmaVHBXH+efH1y7Pj8eFsF9C9MK7tOvd90l9a/r5my5+f7n87t1umjOHvKn6VzW5LbSSvqk2yEn9fBumffJN663yJfaRdlnc/Vnus32ZlG3HEVwjqYV3N16Vp/D5ZY2l4sU2aJd53BKNu3q4j711a4v7usO6fe0nndIN+5vkfbpD3H1Ka1tXv/TbTn+dQnO0cSC235YDoJ71Z3IulNYySt9mHPa79Dugks3rrcY5Jh+rWbtal63HP+6BOdoYsG1mx8GwV3Vy2N3hiuvSbsra7PY7bC7pO5vsToILp3eUsV136MIztHUgmtv3x8El09cgzNcVV8n7F40DAtt28MzXPvH76/vn30BQXCOJhdc/tnI4AqZ07pNZ7j0aX6GVrcMg8s/FqnB1VuU53CvlrtDNPN+y/GvS3COJhdcuyrBbW+aRddQ07y9WeRP2+616vBVavnB72L/w+J6i/Iqte0P8fDTfstRBOdoSsF9KwTniOBsBOeI4GwE54jgbATniOBsBOeI4GwE54jgbATniOBsBOeI4GwE54jgbATniOBsBOeI4GwE54jgbATniOBsBOeI4GwE54jgbATniOBsBOeI4GwE54jgbATniOBsBOeI4GwE54jgbATniOBsBOeI4GwE54jgbATniOBsBOeI4GwE54jgbATniOBsBOeI4GwE54jgbATniOBsBOeI4GwE54jgbATniOBsBOeI4GwE54jgbATniOBsBOeI4GwE54jgbATniOBsBOeI4GwE54jgbATniOBsBOeI4GwE54jgbATniOBsBOeI4GwE54jgbATniOBsBOeI4GwE54jgbA0cvXDm4z6kwCGCgxTBQYrgIEVwkCI4SBEcpAgOUqGD+9Y/Kj1R48581KOfuFG/+TEPPtk7TnDTPPhk7zjBTfPgk73jBDfNg0/2jhPcNA8+2TtOcNM8+GTvOMFN8+CTveMEN82DT/aOE9w0Dz7ZO05w0zz4ZO948OCgR3CQIjhIERykCA5SBAcpgoMUwUGK4CBFcJAKHNxt97+MzP2P/PBu2bbrcY7dTviOZ3GDu7247/6cuR86P27rfNjVGA/cZO94ETa48i9ztrm6G+HY25vFOMee7h3vENzUHrfJ3vFO2OB2V6T+CuXo4fr8blWuTP5XvQnf8SJucO1qtOfe+ZFrzpZjJJFN9o5ngYPDt0BwkCI4SBHc1KRnWdW5/6vUEY9dEdz0jPATX8mxC4Kbnu3NeP/lacxjFwQHKYKDFMFBiuAgRXCQIjhIERykCA5SBAcpgoMUwUGK4CBFcJAiOEgRHKQIDlIEBymCgxTBQYrgIEVwkCI4SBEcpAgOUgQHKYKDFMFBiuAgRXCQIjhIERykCG4Em8v8l6wdfa+D7m0QnnLbfOFfH75784aTR3Aj2Fzmv7H084N7Mpt/H+rRCsGFtrn6OP+S4J58/xeCw3M2V59+vctN5CzSr+3N+8tmtkm/UnC/lLf0eLjOf2/z5vufu7+9OW07W6bfmpzj9sNvTbpp2Vg2dO/W0e3SllsdrKyb5rsaXH4nwLrnfmNayX+cnUSTBDeC1Nh6dhDcxf3D9cX95tWy+3CRT3SrtHDZne/SSrs+v6unre1NzmWeNw421F3ySj3yYGXV1VRunstdDDemlfI2geO9vcxnILgR5MY+LIfBdQGkX+WSejvLG1IEqcB+h/JpH9wiv9tV3jjYUD+s2TxaGVxS62HrxrqSuzsNBDeCUsMPTwe3ypfXfI3rn4nlZtKWYXDri7/TZ4MNdZfVILj9Sh9cXuoOWzfWlfIODCfRHMGNoIRz+/7pM9y8ptUHd/wMtz+J9R+2bfvoDFdXanD51HZ487pSbjfam318DoIbQXmw889GytOr88PgyjO3/Fk9A2aPn8OV514ltrohZVN3Kc/hXi0frdTncLmp2+4MVzf2K+nmBPef1YWTSsvvNPnmp8Pgdq9Sz5b7H26UF6PtLrhym5pt3rC9aRZ1l+5V6uOVN91JLK02b+uludtYV3iViqc9/18jJo7gTg/BQYrgAC8EBymCgxTBQYrgIEVwkCI4SBEcpAgOUgQHKYKDFMFBiuAgRXCQIjhIERykCA5SBAcpgoMUwUHq/674C2CqwF2pAAAAAElFTkSuQmCC" style="display: block; margin: auto;" /></p>
+</div>
+<div id="measures-put-in-place-to-improve-status" class="section level2">
+<h2>Measures put in place to improve status</h2>
+<p>Measures are the planned actions that are intended to achieve the objectives set for given waterbodies/catchments etc. The <code>get_measures</code> function downloads the details of the measures in place or proposed. These data are very patchy, so this will quite often return no data. Only the name and column need to be specified for this - measures are not specified in more detail than this. Measures can be plotted in the same way as RNAG or Protected Areas data (frequency histogram).</p>
+<p>For details of the meaning of the the different columns returned, see the <a href="../articles/cde-output-reference.html">output reference list</a>.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="co"># what measures are there for the Lark Operational Catchment?</span></span>
+<span id="cb17-2"><a href="#cb17-2"></a>lark_OC_meas&lt;-<span class="kw">get_measures</span>(<span class="dt">ea_name=</span><span class="st">&quot;Lark&quot;</span>, <span class="dt">column=</span><span class="st">&quot;OC&quot;</span>)</span></code></pre></div>
+<p>Currently (2019-05-09) there is a problem with the measures data on the CDE website, and no measures information is available to be downloaded, so this will always return an empty dataframe. This is under active investigation by the EA, so should be resolved soon.</p>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
